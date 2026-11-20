@@ -1,0 +1,1 @@
+Kelompok 1 solid solid solid
