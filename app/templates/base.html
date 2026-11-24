@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Collaborative Learning Space{% endblock %}</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- HTMX -->
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --color-orange:    #E8420F;
+            --color-ink:       #1A1A1A;
+            --color-cream:     #FDFAF5;
+            --color-soft:      #F5F0E8;
+            --color-secondary: #8C8C8C;
+            --color-border:    #E0DBD3;
+            --color-success:   #2D6A4F;
+            --color-red:       #DC2626;
+            --radius-sm:  6px; --radius-md: 10px;
+            --radius-lg: 14px; --radius-xl: 18px;
+            --radius-pill: 999px;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--color-soft); color: var(--color-ink); margin: 0; }
+
+        /* Buttons */
+        .btn { display: inline-flex; align-items: center; gap: 6px; border: none; cursor: pointer;
+               font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;
+               border-radius: var(--radius-pill); transition: opacity .15s, transform .1s; text-decoration: none; }
+        .btn:active { transform: scale(.97); }
+        .btn-primary   { background: var(--color-orange); color: #fff; }
+        .btn-primary:hover { opacity: .88; }
+        .btn-secondary { background: transparent; color: var(--color-orange); border: 1.5px solid var(--color-orange); }
+        .btn-secondary:hover { background: #FEF0EB; }
+        .btn-ghost     { background: transparent; color: var(--color-ink); }
+        .btn-ghost:hover { background: var(--color-soft); }
+        .btn-destructive { background: var(--color-red); color: #fff; }
+        .btn-sm  { padding: 6px 14px;  font-size: 12px; }
+        .btn-md  { padding: 10px 20px; font-size: 14px; }
+        .btn-lg  { padding: 14px 28px; font-size: 16px; }
+
+        /* Tabs */
+        .tab-bar { display: flex; border-bottom: 1.5px solid var(--color-border); }
+        .tab-item { padding: 10px 16px; font-size: 14px; font-weight: 500; color: var(--color-secondary);
+                    cursor: pointer; border-bottom: 2.5px solid transparent; margin-bottom: -1.5px; white-space: nowrap; text-decoration: none; }
+        .tab-item.active { color: var(--color-orange); font-weight: 700; border-bottom-color: var(--color-orange); }
+        .tab-item:hover:not(.active) { color: var(--color-ink); }
+
+        /* Avatar */
+        .avatar { border-radius: 50%; background: var(--color-orange); color: #fff; font-weight: 700;
+                  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .avatar-sm { width: 28px; height: 28px; font-size: 10px; }
+        .avatar-md { width: 40px; height: 40px; font-size: 14px; }
+
+        /* Tags */
+        .tag { display: inline-flex; align-items: center; padding: 4px 10px;
+               border-radius: var(--radius-sm); font-size: 12px; font-weight: 500; }
+        .tag-orange  { background: var(--color-orange); color: #fff; }
+        .tag-green   { background: #D1FAE5; color: var(--color-success); }
+        .tag-gray    { background: var(--color-soft); color: var(--color-secondary); border: 1px solid var(--color-border); }
+        .tag-subject { background: #FEF0EB; color: var(--color-orange); }
+
+        /* Cards */
+        .card { background: #fff; border-radius: var(--radius-xl); border: 1px solid var(--color-border); }
+
+        /* Input */
+        .input-field { display: flex; align-items: center; gap: 8px; border: 1.5px solid var(--color-border);
+                       border-radius: var(--radius-md); padding: 10px 14px; background: #fff;
+                       font-family: 'Inter', sans-serif; font-size: 14px; color: var(--color-ink); width: 100%; }
+        .input-field:focus-within { border-color: var(--color-orange); }
+        .input-field input, .input-field textarea, .input-field select {
+            border: none; outline: none; flex: 1; background: transparent;
+            font-family: 'Inter', sans-serif; font-size: 14px; color: var(--color-ink); }
+
+        /* Progress */
+        .progress-track { background: var(--color-border); border-radius: var(--radius-pill); height: 6px; width: 100%; overflow: hidden; }
+        .progress-fill  { background: var(--color-orange); height: 100%; border-radius: var(--radius-pill); }
+
+        /* Search */
+        .search-bar { display: flex; align-items: center; gap: 8px; background: #fff;
+                      border: 1.5px solid var(--color-border); border-radius: var(--radius-pill); padding: 10px 16px; }
+        .search-bar:focus-within { border-color: var(--color-orange); }
+        .search-bar input { flex: 1; border: none; outline: none; font-family: 'Inter', sans-serif;
+                            font-size: 14px; background: transparent; color: var(--color-ink); }
+
+        /* Upvote button */
+        .upvote-btn { display: flex; flex-direction: column; align-items: center; gap: 2px;
+                      font-size: 11px; font-weight: 600; color: var(--color-secondary);
+                      background: none; border: none; cursor: pointer; padding: 4px 8px;
+                      border-radius: var(--radius-md); transition: all .15s; }
+        .upvote-btn:hover { background: #FEF0EB; color: var(--color-orange); }
+        .upvote-btn.voted { color: var(--color-orange); }
+
+        /* Quiz option */
+        .quiz-option { display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+                       border-radius: var(--radius-lg); border: 1.5px solid var(--color-border);
+                       background: #fff; cursor: pointer; transition: border-color .15s; }
+        .quiz-option.selected { border-color: var(--color-orange); }
+        .quiz-label { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center;
+                      justify-content: center; font-size: 13px; font-weight: 700;
+                      background: var(--color-soft); color: var(--color-secondary); flex-shrink: 0; }
+        .quiz-option.selected .quiz-label { background: var(--color-orange); color: #fff; }
+
+        /* Navbar */
+        .nav-link { font-size: 14px; font-weight: 500; color: var(--color-secondary);
+                    padding: 7px 12px; border-radius: var(--radius-pill); text-decoration: none;
+                    transition: all .15s; display: inline-flex; align-items: center; gap: 6px; }
+        .nav-link:hover { color: var(--color-orange); background: #FEF0EB; }
+        .nav-link.active { color: var(--color-orange); background: #FEF0EB; font-weight: 600; }
+
+        /* Divider */
+        .divider { height: 1px; background: var(--color-border); width: 100%; }
+
+        /* Notif dot */
+        .notif-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--color-red); display: inline-block; }
+    </style>
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+<!-- ═══ NAVBAR ═══ -->
+<nav style="background:#fff; border-bottom:1px solid var(--color-border); position:sticky; top:0; z-index:50;">
+    <div style="max-width:1100px; margin:0 auto; padding:0 24px; display:flex; align-items:center; height:60px; gap:8px;">
+
+        <!-- Brand -->
+        <a href="/qna" style="font-size:22px; font-weight:700; color:var(--color-orange); text-decoration:none; margin-right:16px; letter-spacing:-.3px;">
+            CLS
+        </a>
+
+        <!-- Nav links -->
+        <div style="display:flex; align-items:center; gap:2px; flex:1;">
+            <a href="/qna" class="nav-link {% if request.url.path.startswith('/qna') %}active{% endif %}">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                Forum Publik
+            </a>
+            <a href="/spaces" class="nav-link {% if request.url.path.startswith('/spaces') %}active{% endif %}">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+                Spaces
+            </a>
+            <a href="/chat" class="nav-link {% if request.url.path.startswith('/chat') %}active{% endif %}">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                Chat 1-on-1
+            </a>
+        </div>
+
+        <!-- User menu -->
+        <div style="display:flex; align-items:center; gap:10px;">
+            {% if session_user %}
+            <div style="position:relative;" class="user-menu-wrapper">
+                <button onclick="document.getElementById('user-dropdown').classList.toggle('hidden')"
+                    style="display:flex; align-items:center; gap:8px; background:none; border:none; cursor:pointer; padding:4px 8px; border-radius:var(--radius-pill);">
+                    <div class="avatar avatar-md" style="font-size:14px;">{{ session_user.full_name[0].upper() }}</div>
+                    <span style="font-size:13px; font-weight:600; color:var(--color-ink);">{{ session_user.full_name.split()[0] }}</span>
+                    <svg width="14" height="14" fill="none" stroke="var(--color-secondary)" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div id="user-dropdown" class="hidden" style="position:absolute; right:0; top:calc(100% + 8px); width:192px;
+                    background:#fff; border:1px solid var(--color-border); border-radius:var(--radius-xl);
+                    box-shadow:0 8px 24px rgba(0,0,0,.08); padding:8px; z-index:100;">
+                    <div style="padding:10px 12px; border-bottom:1px solid var(--color-border); margin-bottom:4px;">
+                        <p style="font-size:13px; font-weight:700; color:var(--color-ink); margin:0;">{{ session_user.full_name }}</p>
+                        <p style="font-size:11px; color:var(--color-secondary); margin:2px 0 0;">Angkatan {{ session_user.batch_year }}</p>
+                    </div>
+                    <a href="/profile" style="display:flex; align-items:center; gap:8px; padding:8px 12px; font-size:13px;
+                        color:var(--color-ink); text-decoration:none; border-radius:var(--radius-md);"
+                        onmouseover="this.style.background='var(--color-soft)'" onmouseout="this.style.background='none'">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        Profil Saya
+                    </a>
+                    <a href="/logout" style="display:flex; align-items:center; gap:8px; padding:8px 12px; font-size:13px;
+                        color:var(--color-red); text-decoration:none; border-radius:var(--radius-md);"
+                        onmouseover="this.style.background='#FEF2F2'" onmouseout="this.style.background='none'">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                        Keluar
+                    </a>
+                </div>
+            </div>
+            {% else %}
+            <a href="/login" class="btn btn-ghost btn-sm">Masuk</a>
+            <a href="/register" class="btn btn-primary btn-sm">Daftar</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<!-- ═══ MAIN ═══ -->
+<main style="min-height:calc(100vh - 60px - 60px);">
+    {% block content %}{% endblock %}
+</main>
+
+<!-- ═══ FOOTER ═══ -->
+<footer style="background:#fff; border-top:1px solid var(--color-border); padding:20px 24px; text-align:center;">
+    <p style="font-size:13px; color:var(--color-secondary); margin:0;">Collaborative Learning Space &mdash; Proyek Akhir DDP1 <span style="display:inline-flex;align-items:center;vertical-align:middle;"><svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span></p>
+</footer>
+
+{% block scripts %}{% endblock %}
+<script>
+    // Close dropdown on outside click
+    document.addEventListener('click', function(e) {
+        const wrapper = document.querySelector('.user-menu-wrapper');
+        const dropdown = document.getElementById('user-dropdown');
+        if (wrapper && dropdown && !wrapper.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+</script>
+</body>
+</html>
