@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Lengkapi Profil - Collaborative Learning Space{% endblock %}
+
+{% block head %}
+<style>
+    .auth-wrap  { max-width: 420px; margin: 48px auto; padding: 0 16px; }
+    .auth-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .auth-error { background: #FEF2F2; color: var(--color-red); border: 1px solid #FECACA;
+                  border-radius: var(--radius-md); padding: 10px 14px; font-size: 13px; margin-bottom: 16px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+    <div class="card" style="padding:32px;">
+        <h1 style="font-size:24px; font-weight:700; margin:0 0 4px;">
+            Halo, {{ session_user.full_name.split()[0] }}
+        </h1>
+        <p style="font-size:14px; color:var(--color-secondary); margin:0 0 24px;">
+            Satu langkah lagi. Isi angkatanmu supaya teman lain tahu kamu angkatan berapa.
+        </p>
+
+        {% if error %}
+        <div class="auth-error" role="alert">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="/profile/setup">
+            <div style="margin-bottom:24px;">
+                <label class="auth-label" for="batch_year">Angkatan</label>
+                <div class="input-field">
+                    <input type="number" id="batch_year" name="batch_year"
+                           min="2000" max="2100" placeholder="Contoh: 2025" required autofocus />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-lg" style="width:100%; justify-content:center;">
+                Simpan dan lanjut
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
