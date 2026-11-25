@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Profil — {{ user.full_name }}{% endblock %}
+{% block content %}
+<div style="max-width:640px; margin:0 auto; padding:48px 16px;">
+    <div class="card" style="overflow:hidden;">
+        <!-- Banner -->
+        <div style="height:96px; background:linear-gradient(135deg, var(--color-orange) 0%, #ff6b35 100%);"></div>
+        <div style="padding:0 32px 32px;">
+            <!-- Avatar overlapping banner -->
+            <div style="margin-top:-32px; margin-bottom:16px;">
+                <div style="width:64px; height:64px; border-radius:var(--radius-xl); background:var(--color-ink);
+                    color:#fff; display:flex; align-items:center; justify-content:center;
+                    font-size:28px; font-weight:700; border:3px solid #fff;">
+                    {{ user.full_name[0].upper() }}
+                </div>
+            </div>
+            <h1 style="font-size:22px; font-weight:700; margin:0 0 4px;">{{ user.full_name }}</h1>
+            <p style="font-size:14px; color:var(--color-secondary); margin:0 0 24px;">@{{ user.username }} &middot; Angkatan {{ user.batch_year }}</p>
+
+            <!-- Info grid -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;">
+                <div style="background:var(--color-soft); border-radius:var(--radius-lg); padding:16px;">
+                    <p style="font-size:11px; font-weight:700; color:var(--color-secondary); text-transform:uppercase; letter-spacing:.06em; margin:0 0 6px;">Email</p>
+                    <p style="font-size:14px; font-weight:500; margin:0; word-break:break-all;">{{ user.email }}</p>
+                </div>
+                <div style="background:var(--color-soft); border-radius:var(--radius-lg); padding:16px;">
+                    <p style="font-size:11px; font-weight:700; color:var(--color-secondary); text-transform:uppercase; letter-spacing:.06em; margin:0 0 6px;">Nama Anonim</p>
+                    <p style="font-size:14px; font-weight:500; margin:0; font-family:monospace; color:var(--color-orange);">{{ user.anonymous_alias or 'Belum di-generate' }}</p>
+                </div>
+                <div style="background:var(--color-soft); border-radius:var(--radius-lg); padding:16px;">
+                    <p style="font-size:11px; font-weight:700; color:var(--color-secondary); text-transform:uppercase; letter-spacing:.06em; margin:0 0 6px;">Bergabung</p>
+                    <p style="font-size:14px; font-weight:500; margin:0;">{{ user.created_at.strftime('%d %B %Y') }}</p>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <a href="/qna" class="btn btn-primary btn-md">Forum Publik</a>
+                <a href="/spaces" class="btn btn-secondary btn-md">Spaces Saya</a>
+                <a href="/logout" class="btn btn-ghost btn-md" style="color:var(--color-red);">Keluar</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
