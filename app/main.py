@@ -25,9 +25,9 @@ app.add_middleware(SessionMiddleware, secret_key=SECRET_KEY)
 os.makedirs("app/static/uploads", exist_ok=True)
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-from app.routers import auth # tambahin spaces dan public_qna di sini
+from app.routers import auth, public_qna # tambahin spaces di sini
 app.include_router(auth.router)
-# app.include_router(public_qna.router)
+app.include_router(public_qna.router)
 # app.include_router(spaces.router)
 
 
