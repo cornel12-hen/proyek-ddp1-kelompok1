@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}{{ space.title }} — Spaces{% endblock %}
+
+{% block content %}
+<div style="max-width:960px; margin:0 auto; padding:28px 24px;">
+    <a href="/spaces" style="font-size:13px; color:var(--color-secondary); text-decoration:none;">← Semua Spaces</a>
+
+    <!-- Header Space -->
+    <div class="card" style="padding:24px; margin-top:12px; margin-bottom:20px;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
+            <div>
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+                    <span class="tag tag-subject">{{ space.anonymity_mode.value }}</span>
+                    <span class="tag tag-gray">Kode: <strong style="margin-left:4px; font-family:monospace;">{{ space.invite_code }}</strong></span>
+                    <span class="tag tag-gray">{{ space.members|length }} Anggota</span>
+                </div>
+                <h1 style="font-size:24px; font-weight:700; margin:0 0 6px;">{{ space.title }}</h1>
+                <p style="font-size:14px; color:var(--color-secondary); margin:0;">{{ space.description or 'Ruang belajar kolaboratif.' }}</p>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-bar" style="margin-top:20px;">
+            <a href="/spaces/{{ space.id }}?tab=resource" class="tab-item {% if active_tab == 'resource' %}active{% endif %}">
+                Resource ({{ resources|length }})
+            </a>
+            <a href="/spaces/{{ space.id }}?tab=discussion" class="tab-item {% if active_tab == 'discussion' %}active{% endif %}">
+                Discussion ({{ threads|length }})
+            </a>
+            <a href="/spaces/{{ space.id }}?tab=checkpoint" class="tab-item {% if active_tab == 'checkpoint' %}active{% endif %}">
+                Checkpoint ({{ quizzes|length }})
+            </a>
+        </div>
+    </div>
+
+    <!-- TAB 1: RESOURCE -->
+    {% if active_tab == 'resource' %}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="font-size:18px; font-weight:700; margin:0;">Materi & Referensi</h2>
+        {% if is_admin %}
+        <a href="/spaces/{{ space.id }}/resources/add" class="btn btn-primary btn-sm">+ Tambah Materi</a>
+        {% endif %}
+    </div>
+
+    {% if resources %}
+    <div style="display:flex; flex-direction:column; gap:12px;">
+        {% for res in resources %}
+        <div class="card" style="padding:18px 20px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+                <div>
+                    <h3 style="font-size:16px; font-weight:700; margin:0 0 6px;">{{ res.title }}</h3>
+                    {% if res.content_md %}
+                    <p style="font-size:14px; color:var(--color-ink); margin:0 0 10px; white-space:pre-line;">{{ res.content_md }}</p>
+                    {% endif %}
+                    <span style="font-size:12px; color:var(--color-secondary);">Diunggah {{ res.created_at.strftime('%d %b %Y, %H:%M') }}</span>
+                </div>
+                {% if res.file_or_link_url %}
+                <a href="{{ res.file_or_link_url }}" target="_blank" class="btn btn-secondary btn-sm">Buka / Unduh</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card" style="padding:36px; text-align:center; color:var(--color-secondary); font-size:14px;">
+        Belum ada materi yang diunggah di Space ini.
+    </div>
+    {% endif %}
+
+    <!-- TAB 2: DISCUSSION -->
+    {% elif active_tab == 'discussion' %}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="font-size:18px; font-weight:700; margin:0;">Diskusi Kelompok</h2>
+        <a href="/spaces/{{ space.id }}/threads/new" class="btn btn-primary btn-sm">+ Mulai Diskusi</a>
+    </div>
+
+    {% if threads %}
+    <div style="display:flex; flex-direction:column; gap:12px;">
+        {% for th in threads %}
+        <a href="/spaces/{{ space.id }}/threads/{{ th.id }}" class="card" style="padding:18px 20px; text-decoration:none; color:inherit; display:block;"
+           onmouseover="this.style.borderColor='var(--color-orange)'" onmouseout="this.style.borderColor='var(--color-border)'">
+            <h3 style="font-size:16px; font-weight:700; margin:0 0 6px;">{{ th.title }}</h3>
+            <p style="font-size:14px; color:var(--color-secondary); margin:0 0 12px;">{{ th.body[:160] }}{% if th.body|length > 160 %}...{% endif %}</p>
+            <div style="display:flex; justify-content:space-between; font-size:12px; color:var(--color-secondary);">
+                <span>Oleh <strong>{{ th.display_name }}</strong> • {{ th.created_at.strftime('%d %b %Y') }}</span>
+                <span style="color:var(--color-orange); font-weight:600;">{{ th.reply_count }} Balasan</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card" style="padding:36px; text-align:center; color:var(--color-secondary); font-size:14px;">
+        Belum ada topik diskusi. Mulai diskusi pertama sekarang!
+    </div>
+    {% endif %}
+
+    <!-- TAB 3: CHECKPOINT (QUIZ) -->
+    {% elif active_tab == 'checkpoint' %}
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h2 style="font-size:18px; font-weight:700; margin:0;">Checkpoint & Evaluasi</h2>
+        {% if is_admin %}
+        <a href="/spaces/{{ space.id }}/quizzes/create" class="btn btn-primary btn-sm">+ Buat Quiz</a>
+        {% endif %}
+    </div>
+
+    {% if quizzes %}
+    <div style="display:flex; flex-direction:column; gap:12px;">
+        {% for qz in quizzes %}
+        {% set sub = user_submissions.get(qz.id) %}
+        <div class="card" style="padding:18px 20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+                    <span class="tag tag-subject">{{ qz.quiz_type.value }}</span>
+                    {% if sub %}
+                    <span class="tag tag-green">Sudah Dikerjakan (Skor: {{ sub.total_score }})</span>
+                    {% endif %}
+                </div>
+                <h3 style="font-size:16px; font-weight:700; margin:0 0 4px;">{{ qz.title }}</h3>
+                <p style="font-size:13px; color:var(--color-secondary); margin:0;">{{ qz.description or 'Evaluasi pemahaman materi.' }}</p>
+            </div>
+            <div style="display:flex; gap:8px;">
+                {% if sub %}
+                <a href="/spaces/{{ space.id }}/quizzes/{{ qz.id }}/result/{{ sub.id }}" class="btn btn-secondary btn-sm">Lihat Hasil</a>
+                {% endif %}
+                <a href="/spaces/{{ space.id }}/quizzes/{{ qz.id }}" class="btn btn-primary btn-sm">
+                    {% if sub %}Kerjakan Ulang{% else %}Mulai Quiz{% endif %}
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card" style="padding:36px; text-align:center; color:var(--color-secondary); font-size:14px;">
+        Belum ada quiz checkpoint di Space ini.
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

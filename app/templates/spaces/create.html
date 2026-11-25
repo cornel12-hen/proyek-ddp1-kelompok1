@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Buat Space Baru — CLS{% endblock %}
+
+{% block content %}
+<div style="max-width:560px; margin:36px auto; padding:0 24px;">
+    <a href="/spaces" style="font-size:13px; color:var(--color-secondary); text-decoration:none;">← Kembali ke Daftar Space</a>
+    <div class="card" style="padding:28px; margin-top:14px;">
+        <h1 style="font-size:22px; font-weight:700; margin:0 0 6px;">Buat Space Baru</h1>
+        <p style="font-size:13px; color:var(--color-secondary); margin:0 0 20px;">Kode undangan 6 karakter akan dibuat otomatis setelah Space disimpan.</p>
+
+        {% if error %}
+        <div style="background:#FEF2F2; color:var(--color-red); padding:10px 14px; border-radius:var(--radius-md); font-size:13px; margin-bottom:16px;">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="/spaces/create" style="display:flex; flex-direction:column; gap:16px;">
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Nama Space *</label>
+                <div class="input-field">
+                    <input type="text" name="title" placeholder="Contoh: Kelompok DDP1 - Kelas D" required />
+                </div>
+            </div>
+
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Deskripsi</label>
+                <div class="input-field">
+                    <textarea name="description" rows="3" placeholder="Tujuan ruang belajar ini..."></textarea>
+                </div>
+            </div>
+
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Mode Anonimitas Diskusi</label>
+                <div class="input-field">
+                    <select name="anonymity_mode">
+                        <option value="USER_CHOICE">USER_CHOICE (Anggota bebas memilih anonim atau nama asli)</option>
+                        <option value="OPEN_ONLY">OPEN_ONLY (Semua postingan wajib menampilkan nama asli)</option>
+                        <option value="ANON_ONLY">ANON_ONLY (Semua anggota otomatis anonim kecuali admin)</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-md" style="justify-content:center; margin-top:4px;">Buat Space</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
