@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Tambah Materi — {{ space.title }}{% endblock %}
+
+{% block content %}
+<div style="max-width:580px; margin:32px auto; padding:0 24px;">
+    <a href="/spaces/{{ space.id }}?tab=resource" style="font-size:13px; color:var(--color-secondary); text-decoration:none;">← Kembali ke {{ space.title }}</a>
+    <div class="card" style="padding:28px; margin-top:12px;">
+        <h1 style="font-size:20px; font-weight:700; margin:0 0 18px;">Tambah Materi / Resource</h1>
+
+        <form method="post" action="/spaces/{{ space.id }}/resources/add" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:16px;">
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Judul Materi *</label>
+                <div class="input-field">
+                    <input type="text" name="title" placeholder="Contoh: Slide Rekursi & List" required />
+                </div>
+            </div>
+
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Catatan / Ringkasan</label>
+                <div class="input-field">
+                    <textarea name="content_md" rows="4" placeholder="Tulis ringkasan materi atau instruksi belajar..."></textarea>
+                </div>
+            </div>
+
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Upload File (PDF, ZIP, PY, dll)</label>
+                <div class="input-field">
+                    <input type="file" name="file" />
+                </div>
+            </div>
+
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Atau Tautan Eksternal (Opsional)</label>
+                <div class="input-field">
+                    <input type="url" name="external_link" placeholder="https://..." />
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-md" style="justify-content:center;">Simpan Materi</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

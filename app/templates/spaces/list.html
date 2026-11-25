@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Spaces — Collaborative Learning Space{% endblock %}
+
+{% block content %}
+<div style="max-width:960px; margin:0 auto; padding:32px 24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:24px;">
+        <div>
+            <h1 style="font-size:24px; font-weight:700; margin:0;">Collaborative Spaces</h1>
+            <p style="font-size:14px; color:var(--color-secondary); margin:4px 0 0;">Ruang belajar kelompok untuk berbagi materi, diskusi, dan checkpoint kuis.</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <a href="/spaces/join" class="btn btn-secondary btn-md">Gabung Kode</a>
+            <a href="/spaces/create" class="btn btn-primary btn-md">+ Buat Space</a>
+        </div>
+    </div>
+
+    {% if spaces %}
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+        {% for sp in spaces %}
+        <a href="/spaces/{{ sp.id }}" class="card" style="padding:20px; text-decoration:none; color:inherit; display:flex; flex-direction:column; justify-content:space-between; transition:border-color .15s;"
+           onmouseover="this.style.borderColor='var(--color-orange)'" onmouseout="this.style.borderColor='var(--color-border)'">
+            <div>
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:10px;">
+                    <span class="tag tag-subject">{{ sp.anonymity_mode.value }}</span>
+                    <span class="tag tag-gray" style="font-family:monospace;">{{ sp.invite_code }}</span>
+                </div>
+                <h2 style="font-size:17px; font-weight:700; margin:0 0 6px;">{{ sp.title }}</h2>
+                <p style="font-size:13px; color:var(--color-secondary); margin:0 0 16px; line-height:1.5;">
+                    {{ sp.description or 'Tidak ada deskripsi.' }}
+                </p>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid var(--color-border); font-size:12px; color:var(--color-secondary);">
+                <span>{{ sp.members|length }} Anggota</span>
+                <span style="color:var(--color-orange); font-weight:600;">Masuk Space →</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="card" style="padding:48px 24px; text-align:center;">
+        <h3 style="font-size:18px; font-weight:700; margin:0 0 8px;">Kamu belum tergabung di Space manapun</h3>
+        <p style="font-size:14px; color:var(--color-secondary); margin:0 0 20px;">Buat Space baru untuk kelompokmu atau masukkan kode undangan dari teman.</p>
+        <div style="display:flex; justify-content:center; gap:10px;">
+            <a href="/spaces/join" class="btn btn-secondary btn-md">Gabung via Kode</a>
+            <a href="/spaces/create" class="btn btn-primary btn-md">Buat Space Baru</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

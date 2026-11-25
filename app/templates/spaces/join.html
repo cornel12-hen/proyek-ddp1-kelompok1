@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Gabung Space — CLS{% endblock %}
+
+{% block content %}
+<div style="max-width:460px; margin:48px auto; padding:0 24px;">
+    <a href="/spaces" style="font-size:13px; color:var(--color-secondary); text-decoration:none;">← Kembali ke Daftar Space</a>
+    <div class="card" style="padding:28px; margin-top:14px;">
+        <h1 style="font-size:22px; font-weight:700; margin:0 0 6px;">Gabung ke Space</h1>
+        <p style="font-size:13px; color:var(--color-secondary); margin:0 0 20px;">Masukkan 6 karakter kode undangan dari admin Space.</p>
+
+        {% if error %}
+        <div style="background:#FEF2F2; color:var(--color-red); padding:10px 14px; border-radius:var(--radius-md); font-size:13px; margin-bottom:16px;">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" action="/spaces/join" style="display:flex; flex-direction:column; gap:16px;">
+            <div>
+                <label style="display:block; font-size:13px; font-weight:600; margin-bottom:6px;">Kode Undangan</label>
+                <div class="input-field">
+                    <input type="text" name="invite_code" maxlength="6" placeholder="MISAL: A1B2C3" style="text-transform:uppercase; font-family:monospace; letter-spacing:2px;" required />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary btn-md" style="justify-content:center;">Gabung Space</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
