@@ -15,6 +15,7 @@ from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 
 from app.database import get_db
@@ -45,16 +46,35 @@ def _display_name(author: User, is_anonymous: bool) -> str:
 # ─────────────────────────────────────────────
 
 @router.get("", response_class=HTMLResponse)
-def qna_feed(request: Request, q: str = "", db: Session = Depends(get_db)):
-    """Tampilkan feed pertanyaan publik, dengan pencarian BM25 jika ada query."""
+def qna_feed(request: Request, q: str = "", tag: str = "",
+             sort: str = "recent", db: Session = Depends(get_db)):
+    """
+    Feed forum publik dengan pencarian BM25, filter tag, dan sorting.
+
+    Parameters
+    ----------
+    q    : kata kunci pencarian (BM25)
+    tag  : filter berdasarkan tag topik
+    sort : 'recent' (default) atau 'popular'
+    """
     user = _get_user(request, db)
     if not user:
         return RedirectResponse(url="/login", status_code=302)
 
-    # Take all the question
-    all_questions = db.query(PublicQuestion).order_by(PublicQuestion.created_at.desc()).all()
+    # Filter tag dan sorting di level database
+    query = db.query(PublicQuestion)
+    if tag:
+        query = query.filter(PublicQuestion.topic_tag.ilike(f"%{tag}%"))
 
-    # SPrepare the data for template
+    if sort == "popular":
+        query = query.order_by(PublicQuestion.upvote_count.desc(),
+                               PublicQuestion.created_at.desc())
+    else:
+        query = query.order_by(PublicQuestion.created_at.desc())
+
+    all_questions = query.all()
+
+    # Siapkan data untuk template
     questions_data = []
     for ques in all_questions:
         author = db.query(User).filter(User.id == ques.author_id).first()
@@ -80,20 +100,29 @@ def qna_feed(request: Request, q: str = "", db: Session = Depends(get_db)):
             "created_at": ques.created_at,
         })
 
-    # BM25 search if there is query
+    # Pencarian BM25 jika ada kata kunci
     if q.strip():
         scored = search_questions(q, questions_data)
-        # Filter out zero-score results when there's a query
         questions_data = [item for item, score in scored if score > 0]
-        if not questions_data and q.strip():
-            # If nothing matched, show all sorted by relevance anyway
-            questions_data = [item for item, score in scored]
+
+    # Tag paling sering dipakai, untuk chip filter
+    popular_tags = [
+        row.topic_tag for row in
+        db.query(PublicQuestion.topic_tag, func.count(PublicQuestion.id))
+        .filter(PublicQuestion.topic_tag.isnot(None))
+        .group_by(PublicQuestion.topic_tag)
+        .order_by(func.count(PublicQuestion.id).desc())
+        .limit(10).all()
+    ]
 
     return templates.TemplateResponse("public_qna/feed.html", {
         "request": request,
         "session_user": user,
         "questions": questions_data,
         "search_query": q,
+        "search_tag": tag,
+        "search_sort": sort,
+        "popular_tags": popular_tags,
     })
 
 

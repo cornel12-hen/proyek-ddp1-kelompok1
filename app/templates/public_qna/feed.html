@@ -17,6 +17,8 @@
 
     <!-- Search -->
     <form method="get" action="/qna" style="margin-bottom:28px;">
+                <input type="hidden" name="tag" value="{{ search_tag }}" />
+        <input type="hidden" name="sort" value="{{ search_sort }}" />
         <div style="display:flex; gap:10px;">
             <div class="search-bar" style="flex:1;">
                 <svg width="16" height="16" fill="none" stroke="var(--color-secondary)" stroke-width="2" viewBox="0 0 24 24">
@@ -30,6 +32,34 @@
             <button type="submit" class="btn btn-primary btn-md">Cari</button>
         </div>
     </form>
+
+    <!-- Filter tag chips -->
+    {% if popular_tags %}
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; align-items:center;">
+        <span style="font-size:12px; font-weight:600; color:var(--color-secondary);">Tag:</span>
+        {% for t in popular_tags %}
+        <a href="/qna?q={{ search_query|urlencode }}&tag={{ t|urlencode }}&sort={{ search_sort|urlencode }}"
+           class="tag {% if search_tag == t %}tag-orange{% else %}tag-gray{% endif %}"
+           style="text-decoration:none;">{{ t }}</a>
+        {% endfor %}
+        {% if search_tag %}
+        <a href="/qna?q={{ search_query|urlencode }}&sort={{ search_sort|urlencode }}"
+           class="tag tag-gray" style="text-decoration:none;">Hapus filter</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Tombol sorting -->
+    <div style="display:flex; gap:8px; margin-bottom:20px;">
+        <a href="/qna?q={{ search_query|urlencode }}&tag={{ search_tag|urlencode }}&sort=recent"
+           class="btn btn-sm {% if search_sort != 'popular' %}btn-primary{% else %}btn-secondary{% endif %}">
+            Terbaru
+        </a>
+        <a href="/qna?q={{ search_query|urlencode }}&tag={{ search_tag|urlencode }}&sort=popular"
+           class="btn btn-sm {% if search_sort == 'popular' %}btn-primary{% else %}btn-secondary{% endif %}">
+            Terpopuler
+        </a>
+    </div>
 
     <!-- Questions -->
     {% if questions %}
